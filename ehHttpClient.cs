@@ -25,21 +25,14 @@ public class EhHttpClient
         var _sasToken = String.Format(CultureInfo.InvariantCulture, "sr={0}&sig={1}&se={2}&skn={3}", HttpUtility.UrlEncode(resourceUri), HttpUtility.UrlEncode(signature), expiry, keyName);
         sasToken = _sasToken;
         ehUrl = resourceUri;
+
     }
     public async Task SendSingleMessageAsync(object sendWhat)
     {
-        // POST https://<yournamespace>.servicebus.windows.net/<yourentity>/messages
-        // Content-Type: application/json
-        // Authorization: SharedAccessSignature sr=https%3A%2F%2F<yournamespace>.servicebus.windows.net%2F<yourentity>&sig=<yoursignature from code above>&se=1438205742&skn=KeyName
-        // ContentType: application/atom+xml;type=entry;charset=utf-8
-
         var hrm = new HttpRequestMessage(HttpMethod.Post, ehUrl);       
         hrm.Headers.Authorization = new AuthenticationHeaderValue("SharedAccessSignature", sasToken);
         string content = JsonSerializer.Serialize(sendWhat);
         StringContent stc = new StringContent(content,Encoding.UTF8,"application/json");
-      
-        //stc.Headers.Add("Content-Type","application/json");
-        //stc.Headers.Add("ContentType","application/atom+xml;type=entry;charset=utf-8");
         hrm.Content = stc; 
         Console.WriteLine($"Sending HTTP Payload of {content.Length} chars (in UTF-8) to URI {ehUrl} with SAS {sasToken}");
         var htr = await httpClient.SendAsync(hrm);
@@ -49,24 +42,17 @@ public class EhHttpClient
 
     public async Task SendMessageBatchAsync(object[] sendwhat)
     {
-        // POST https://your-namespace.servicebus.windows.net/your-event-hub/messages?timeout=60&api-version=2014-01 HTTP/1.1  
-        // Authorization: SharedAccessSignature sr=your-namespace.servicebus.windows.net&sig=your-sas-key&se=1456197782&skn=RootManageSharedAccessKey  
-        // Content-Type: application/vnd.microsoft.servicebus.json  
-        // Host: your-namespace.servicebus.windows.net  
-        // [{"Body":"Message1", "UserProperties":{"Alert":"Strong Wind"}},{"Body":"Message2"},{"Body":"Message3"}]  
 
         var hrm = new HttpRequestMessage(HttpMethod.Post, ehUrl);
         hrm.Headers.Authorization = new AuthenticationHeaderValue("SharedAccessSignature", sasToken);
         string content = JsonSerializer.Serialize(sendwhat);
        
-
         StringContent stc = new StringContent(content,Encoding.UTF8,"application/vnd.microsoft.servicebus.json");
         //stc.Headers.Add("Content-Type","application/vnd.microsoft.servicebus.json");
         hrm.Content = stc; 
-        Console.WriteLine($"Sending HTTP Payload of {content.Length} chars (in UTF-8) to URI {ehUrl} with SAS {sasToken}");
-
+        Console.WriteLine($"Sending HTTP Batch Payload of {content.Length} chars (in UTF-8) to URI {ehUrl} with SAS {sasToken}");
         var htr = await httpClient.SendAsync(hrm);
-        // htr.EnsureSuccessStatusCode();
+        htr.EnsureSuccessStatusCode();
         Console.WriteLine($"Status : {htr.StatusCode} {await htr.Content.ReadAsStringAsync()}");
 
     }

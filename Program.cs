@@ -27,7 +27,26 @@ namespace eventHubsHttpOnly
 
             // }
 
-            // Batched
+            // Batched, single thread
+            // await SendMe(counter,  ehHttpClient);
+
+            // Batched, multithreaded senders
+            List<Task> tlist = new List<Task>();
+
+            for (int i = 0; i < 4; i++)
+            {
+                Task tas = Task.Run(async() => {await SendMe(counter,  ehHttpClient);});
+                tlist.Add(tas);
+            };
+            
+            // If we get an aggregate exception we'll return from here if any of our workers bomb out.
+            Task.WaitAll(tlist.ToArray());
+
+            Console.WriteLine("Waitall seems to have completed? ");
+
+        }
+        public static async Task SendMe(int counter, EhHttpClient ehHttpClient){
+
             while(1==1)
             {
                 ++counter; 
@@ -50,6 +69,7 @@ namespace eventHubsHttpOnly
                 await Task.Delay(300);
 
             }
+
         }
     }
     public class TelemetryData
