@@ -9,23 +9,11 @@ namespace eventHubsHttpOnly
         static async Task Main(string[] args)
         {
             Console.WriteLine("Spinning up a connection.");
-            var ehHttpClient = new EhHttpClient("https://f1telemetry.servicebus.windows.net/f1messages/messages","RootManageSharedAccessKey","UTqF4AbaJcTUz7QMDTXzhIhKuQmWmKYHtPG7LTamG2E=");
+            var ehHttpClient = new EhHttpClient("https://willstestns.servicebus.windows.net/messages/messages","RootManageSharedAccessKey","UhTqrfuy9CNy7f6B5xpmIQLPy0vDplElK5TEIJVpExY=");
             int counter = 1;
 
             // Indvidual
-            // while(1==1)
-            // {
-            //     ++counter; 
-            //     Console.WriteLine($"Sending {counter}");
-                
-            //     List<object> lobj = new List<object>();
-                
-            //     await ehHttpClient.SendSingleMessageAsync(new TelemetryData() { Speed= (160 + counter), Gear=2, RandomJunkPadding = "alskdjfhslfjkasdhfkjlhsdljkfasdhfsjkdlfhsduifysa90d87uy qcn509tq7349uh356423uyp862yh35uo6yh253uipt793q7rwgyasfdp7igyaghvscygq7hlt23pig8yavsfgyp9q54eghioq3e576h247otygq"});
-            //     Console.WriteLine($"Sent message {counter}");
-
-            //     await Task.Delay(300);
-
-            // }
+            // await SendMeIndividual(counter, ehHttpClient);
 
             // Batched, single thread
             // await SendMe(counter,  ehHttpClient);
@@ -33,7 +21,7 @@ namespace eventHubsHttpOnly
             // Batched, multithreaded senders
             List<Task> tlist = new List<Task>();
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 8; i++)
             {
                 Task tas = Task.Run(async() => {await SendMe(counter,  ehHttpClient);});
                 tlist.Add(tas);
@@ -42,10 +30,24 @@ namespace eventHubsHttpOnly
             // If we get an aggregate exception we'll return from here if any of our workers bomb out.
             Task.WaitAll(tlist.ToArray());
 
-            Console.WriteLine("Waitall seems to have completed? ");
+
 
         }
-        public static async Task SendMe(int counter, EhHttpClient ehHttpClient){
+
+        private static async Task SendMeIndividual(int counter, EhHttpClient ehHttpClient)
+        {
+            while(1==1)
+            {
+                ++counter; 
+                Console.WriteLine($"Sending {counter}");
+                List<object> lobj = new List<object>();
+                await ehHttpClient.SendSingleMessageAsync(new TelemetryData() { Speed= (160 + counter), Gear=2, RandomJunkPadding = "alskdjfhslfjkasdhfkjlhsdljkfasdhfsjkdlfhsduifysa90d87uy qcn509tq7349uh356423uyp862yh35uo6yh253uipt793q7rwgyasfdp7igyaghvscygq7hlt23pig8yavsfgyp9q54eghioq3e576h247otygq"});
+                Console.WriteLine($"Sent message {counter}");
+
+            }
+        }
+
+        private static async Task SendMe(int counter, EhHttpClient ehHttpClient){
 
             while(1==1)
             {
@@ -65,8 +67,6 @@ namespace eventHubsHttpOnly
 
                 await ehHttpClient.SendMessageBatchAsync(lobj.ToArray());
                 Console.WriteLine($"Sent batch of 1000 messages {counter}");
-
-                await Task.Delay(300);
 
             }
 
