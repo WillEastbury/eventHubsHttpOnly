@@ -8,7 +8,7 @@ namespace eventHubsHttpOnly
     class Program
     {
         static async Task Main(string[] args)
-        {
+        {  
             // Console.WriteLine("Spinning up a connection.");
             var ehHttpClient = new EhHttpClient("https://willstestns.servicebus.windows.net/messages/messages","RootManageSharedAccessKey","");
             
