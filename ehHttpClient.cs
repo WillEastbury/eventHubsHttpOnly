@@ -32,10 +32,10 @@ public class EhHttpClient
         string content = JsonSerializer.Serialize(sendWhat);
         StringContent stc = new StringContent(content,Encoding.UTF8,"application/json");
         hrm.Content = stc; 
-        Console.WriteLine($"Sending HTTP Payload of {content.Length} chars (in UTF-8) to URI {ehUrl} with SAS {sasToken}");
+        //Console.WriteLine($"Sending HTTP Payload of {content.Length} chars (in UTF-8) to URI {ehUrl} with SAS {sasToken}");
         var htr = await httpClient.SendAsync(hrm);
-        htr.EnsureSuccessStatusCode();
-        Console.WriteLine($"Status : {htr.StatusCode} {await htr.Content.ReadAsStringAsync()}");
+        //htr.EnsureSuccessStatusCode();
+        //Console.WriteLine($"Status : {htr.StatusCode} {await htr.Content.ReadAsStringAsync()}");
     }
 
     public async Task SendMessageBatchAsync(object[] sendwhat)
@@ -45,10 +45,10 @@ public class EhHttpClient
         string content = JsonSerializer.Serialize(sendwhat);      
         StringContent stc = new StringContent(content,Encoding.UTF8,"application/vnd.microsoft.servicebus.json");
         hrm.Content = stc; 
-        Console.WriteLine($"Sending HTTP Batch Payload of {content.Length} chars (in UTF-8) to URI {ehUrl} with SAS {sasToken}");
+        //Console.WriteLine($"Sending HTTP Batch Payload of {content.Length} chars (in UTF-8) to URI {ehUrl} with SAS {sasToken}");
         var htr = await httpClient.SendAsync(hrm);
-        htr.EnsureSuccessStatusCode();
-        Console.WriteLine($"Status : {htr.StatusCode} {await htr.Content.ReadAsStringAsync()}");
+        //htr.EnsureSuccessStatusCode();
+        //Console.WriteLine($"Status : {htr.StatusCode} {await htr.Content.ReadAsStringAsync()}");
 
     }
 }
