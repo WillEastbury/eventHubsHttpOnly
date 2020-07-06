@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
@@ -42,13 +43,33 @@ public class EhHttpClient
     {
         var hrm = new HttpRequestMessage(HttpMethod.Post, ehUrl);
         hrm.Headers.Authorization = new AuthenticationHeaderValue("SharedAccessSignature", sasToken);
-        string content = JsonSerializer.Serialize(sendwhat);      
+        
+        string content = JsonSerializer.Serialize(sendwhat.Select( e => new {Body = JsonSerializer.Serialize(e)}));      
         StringContent stc = new StringContent(content,Encoding.UTF8,"application/vnd.microsoft.servicebus.json");
+        stc.Headers.ContentType.CharSet = string.Empty;
         hrm.Content = stc; 
-        //Console.WriteLine($"Sending HTTP Batch Payload of {content.Length} chars (in UTF-8) to URI {ehUrl} with SAS {sasToken}");
         var htr = await httpClient.SendAsync(hrm);
-        //htr.EnsureSuccessStatusCode();
-        //Console.WriteLine($"Status : {htr.StatusCode} {await htr.Content.ReadAsStringAsync()}");
+        Console.WriteLine($"{content.Length} Chars - {htr.StatusCode} {await htr.Content.ReadAsStringAsync()}");
 
+        // if (htr.StatusCode.ToString() == "ServiceUnavailable")
+        // {
+            
+        //    await Task.Delay(250);
+        //    var htr2 = await httpClient.SendAsync(hrm);
+        //    Console.WriteLine($"retriedwith: {htr2.StatusCode} {await htr.Content.ReadAsStringAsync()}");
+
+        //     if (htr.StatusCode.ToString() == "ServiceUnavailable")
+        //     {
+                
+        //         await Task.Delay(1000);
+        //         var htr3 = await httpClient.SendAsync(hrm);
+        //         Console.WriteLine($"retriedagainwith: {htr3.StatusCode} {await htr.Content.ReadAsStringAsync()}");
+
+        //         if (htr.StatusCode.ToString() == "ServiceUnavailable")
+        //         {
+        //             Console.WriteLine($"YOU WIN: {htr3.StatusCode} {await htr.Content.ReadAsStringAsync()}");
+        //         }
+        //     }
+        // }
     }
 }
